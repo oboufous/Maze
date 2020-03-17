@@ -99,7 +99,6 @@ class Maze(tk.Tk, object):
         return self.canvas.coords(self.rect)
 
     def step(self, action):
-        visited = []
         s = self.canvas.coords(self.rect)
         base_action = np.array([0, 0])
         if action == 0:   # up
@@ -118,42 +117,19 @@ class Maze(tk.Tk, object):
         self.canvas.move(self.rect, base_action[0], base_action[1])  # move agent
 
         s_ = self.canvas.coords(self.rect)  # next state
-        visited.append(s_)
 
         # Reward function
         if s_ in paradises_coord:
-            if len(paradises_coord) != 0:
-                if s_ in visited:
-                    reward = -5
-                else:
-                    reward = 5
-                print('- - - - - - - - -> paradises_positions', paradises_positions)
-                oval_position = paradises_coord.index(s_)
-                print('- - - - - - - - -> oval_position', oval_position)
-                paradise_obj = paradises[oval_position] # oval position in list
-                self.canvas.delete(paradise_obj) # oval object
-                del paradises_coord[oval_position]
-                del paradises_positions[oval_position]
-                del paradises[oval_position]
-                done = False
-            else:
-                reward = 10
-                done = True
-                s_ = 'terminal'
-        elif s_ in hell_coord:
-            if s_ in visited:
-                reward = -5
-            else:
-                reward = -1
+            reward = 1
             done = True
             s_ = 'terminal'
-        else:
-            if s_ in visited:
-                reward = -5
-            else:
-                reward = 0
+        elif s_ in hell_coord:
+            reward = -1
+            done = True
+            s_ = 'terminal'
+        else: # if normal white empty cell
+            reward = 0
             done = False
-
         return s_, reward, done
 
     def render(self):
